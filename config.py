@@ -1,5 +1,5 @@
 """
-File for configuration of the app.
+Configuration of the app.
 """
 
 # ARGUMENTS

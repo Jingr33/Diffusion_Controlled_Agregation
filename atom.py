@@ -1,4 +1,4 @@
-from vispy import scene # visualization of simulations
+from vispy import scene  # visualization of the simulation
 from vispy.visuals.transforms import STTransform
 from typing import Any
 
@@ -9,23 +9,24 @@ import numpy as np
 
 class Atom ():
     """
-    Representation of one atom (particle) in simulation.
+    Representation of a single atom (particle) in the simulation.
 
     Attributes:
-        type (str): electrode or ion
-        position (np.array): 3D position of the atom in a space
-        generation (int): generation of particle in dendrimer
-        positions_list (list): list of all positions during simulation
-        electrode_dist (float): distance to nearest electrode postion
-        parent_electrode (Atom): Ion -> None, Electrode -> neighboring electrode with lower genreation
+        type (str): "electrode" or "ion".
+        position (np.array): 3D position of the atom in space.
+        generation (int): Generation index of the particle within the dendrimer.
+        positions_list (list): List of all positions occupied during the simulation.
+        electrode_dist (float): Distance to the nearest electrode position.
+        parent_electrode (Atom): For ions: None. For electrodes: reference to the
+            neighboring electrode with lower generation.
     """
     def __init__(self, type : str, position : np.array) -> None:
         """
-        Initialize an atom.
+        Initialize an Atom instance.
 
         Args:
-            type (str): electrode or ion
-            position (np.array): 3D position of the atom in a space
+            type (str): "electrode" or "ion".
+            position (np.array): 3D position of the atom in space.
         """
         self.type = type
         self.position = position
@@ -37,11 +38,11 @@ class Atom ():
             
     def display(self, view, sim_time : str) -> None:
         """
-        Display the atom in visualization as a sphere.
+        Display the atom as a sphere in the visualization.
 
         Args:
-            view (vispy.scene.visuals): view window of the simulation
-            sim_time (str): 'start' or 'finish' (start or end state of the simulation)
+            view (vispy.scene.visuals): View window for the simulation.
+            sim_time (str): "start" or "finish" (initial or final state).
         """
         generation = self.generation if sim_time != "start" else self.orig_generation
         position = self.positions_list[0] if sim_time == "start" else self.positions_list[-1]
@@ -49,48 +50,48 @@ class Atom ():
         self.sphere = scene.visuals.Sphere(radius=config.atom_radius, method='ico', parent=view.scene, color = self.color, edge_color = config.atom_edge_color)
         self._translate_sphere(position)
 
-    def _set_fg_color (self, generation : int) -> Any:
-        """
-        Set a color of the atom depending on its generation in dendrimer.
-
-        Args:
-            generation (int): generation of the particle (if -1, it is a free ion)
-        
-        Return:
-            Any: Color of the atom in format from config file (BGR, HEX, ...)
-        """
-        if (generation == -1):
-            return config.atom_color[-1]
-        return config.atom_color[generation % 10]
-
     def update_position(self, new_position : np.array) -> None:
         """
-        Method for updating an atom position.
+        Update the atom's current position.
 
         Args:
-            new_positon (np.array): new 3D position of the atom.
+            new_position (np.array): New 3D position of the atom.
         """
         self.position = new_position
         self.positions_list.append(new_position)
 
-    def _translate_sphere (self, pos : np.array) -> None:
-        """
-        Set or shift the atom in the entered positon in the space.
-
-        Args:
-            pos (np.array): 3D position of the atom in the space.
-        """
-        self.sphere.transform = STTransform(translate=[pos[0], pos[1], pos[2]])
-
     def transform_to_electrode (self, nearest_electrode) -> None:
         """
-        Transform an ion to a eletrode when bound the dendrimer structure.
+        Convert an ion into an electrode when it becomes bound to the dendrimer.
 
         Args:
-            nearest_electrode (Atom): nearest (connected) electrode to this atom.
+            nearest_electrode (Atom): Nearest (connected) electrode to this atom.
         """
         self.type = "electrode"
         self.parent_electrode = nearest_electrode
         self.generation = self.parent_electrode.generation + 1
         new_pos = Calculation.final_pos_optimalization(self)
         self.update_position(new_pos)
+
+    def _set_fg_color (self, generation : int) -> Any:
+        """
+        Determine the atom color based on its generation in the dendrimer.
+
+        Args:
+            generation (int): Generation index of the particle (use -1 for a free ion).
+
+        Returns:
+            Any: Color specification for the atom, in the format used by the config.
+        """
+        if (generation == -1):
+            return config.atom_color[-1]
+        return config.atom_color[generation % 10]
+
+    def _translate_sphere (self, pos : np.array) -> None:
+        """
+        Place or move the atom's visual sphere to the given position.
+
+        Args:
+            pos (np.array): 3D position of the atom in space.
+        """
+        self.sphere.transform = STTransform(translate=[pos[0], pos[1], pos[2]])

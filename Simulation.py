@@ -8,26 +8,27 @@ from atom import Atom
 
 class Simulation ():
     """
-    Class for managing simulation of the creation of the dendrimer and visualization of the process.
+    Class that manages the simulation of dendrimer formation and its
+    visualization.
 
-    Attributtes:
-        layout (str): Starting layout of the free ions in the space
-        atoms_num (int): number of atoms in sim
-        ions (list): list of all ions in sim
-        electrodes (list): list of all electrodes in sim
-        _radius_of_gyration (float): gyration radius of the created dendrimer
-        canvas (scene): canvas of the visualization
-        vb1: viewbox 1
-        vb2: viewbox 2
+    Attributes:
+        layout (str): Starting layout of free ions in space.
+        atoms_num (int): Number of atoms in the simulation.
+        ions (list): List of ion objects in the simulation.
+        electrodes (list): List of electrode objects in the simulation.
+        _radius_of_gyration (float): Gyration radius of the resulting dendrimer.
+        canvas (scene): Visualization canvas.
+        vb1: First viewbox for visualization.
+        vb2: Second viewbox for visualization.
     """
     def __init__(self, layout : str, atoms_num : int, visualize : bool) -> None:
         """
-        Initialize Simulation
+        Initialize the Simulation object.
 
         Args:
-            layout (str): Starting layout of the simulation
-            atoms_num (int): number of atoms in the simulation
-            viualize (bool): if the visualization is enabled
+            layout (str): Starting layout of the simulation.
+            atoms_num (int): Number of atoms in the simulation.
+            visualize (bool): Whether visualization is enabled.
         """
         self.layout = layout
         self.atoms_num = atoms_num
@@ -37,52 +38,20 @@ class Simulation ():
         self._generate_ion_layout()
         self.electrode = self._generate_elecrode()
         self._calculate_simulation()
-        if (visualize): self._visualize()
+        if (visualize):
+            self._visualize()
         self._radius_of_gyration = self._calc_gyration()
         self._gyration_to_db()
 
-    def _visualize(self) -> None:
+    def run(self) -> None:
         """
-        Visualize start and end point of the simulation at the end of the process (if it is enabled).
+        Start the visualization.
         """
-        self._init_scene()
-        self._display_sim_state("start", self.vb1)
-        self._display_sim_state("finish", self.vb2)
-
-    def _init_scene(self) -> None:
-        """
-        Initialize scene (canvas and viewboxes) for visualization of simulation.
-        """
-        self.canvas = scene.SceneCanvas(keys='interactive', bgcolor='black',
-                           size=(1200, 750), show=True, fullscreen=True)
-        self.vb1 = scene.widgets.ViewBox(border_color='gray', parent=self.canvas.scene)
-        self.vb2 = scene.widgets.ViewBox(border_color='gray', parent=self.canvas.scene)
-        # grid
-        grid = self.canvas.central_widget.add_grid()
-        grid.padding = 10
-        grid.add_widget(self.vb1, 0, 0)
-        grid.add_widget(self.vb2, 0, 1)
-        # camera
-        self.vb1.camera = 'arcball'
-        self.vb1.camera.set_range(x=[-20, 20], y=[-20, 20], z=[-20, 20])
-        self.vb2.camera = 'arcball'
-        self.vb2.camera.set_range(x=[-20, 20], y=[-20, 20], z=[-20, 20])
-
-    def _display_sim_state (self, sim_time : str, viewbox) -> None:
-        """
-        Dispaly elected state of the simulation in the viewbox
-
-        Args:
-            sim_time (str): time state of the simulation
-            viewbox: viewbox of the scene
-        """
-        self.atoms = self.ions + self.electrodes
-        for atom in self.atoms:
-            atom.display(viewbox, sim_time)        
+        self.canvas.app.run()
 
     def _generate_ion_layout (self) -> None:
         """
-        Generate initial layout of atoms in the space (through layout generator).
+        Generate the initial layout of atoms using the layout generator.
         """
         layout_gen = LayoutGenerator(self.layout, self.atoms_num)
         coords = layout_gen.get_start_pos()
@@ -92,35 +61,68 @@ class Simulation ():
 
     def _generate_elecrode(self) -> Atom:
         """
-        Create first electrode in the before start of the simulation.
+        Create the first electrode before the simulation starts.
 
         Returns:
-            Atom: electrode in the (0, 0, 0) postion
+            Atom: Electrode placed at position (0, 0, 0).
         """
         electrode = Atom("electrode", np.array([0, 0, 0]))
         electrode.parent_electrode = electrode
         self.ions.append(electrode)
         return electrode
-    
+
     def _calculate_simulation (self) -> None:
         """
-        Calculate simulation (through a Calculation class).
+        Run the simulation calculation using the Calculation class.
         """
         calc = Calculation(self)
         calc.calculate_sim()
+    
+    def _visualize(self) -> None:
+        """
+        Visualize the start and end states of the simulation (if enabled).
+        """
+        self._init_scene()
+        self._display_sim_state("start", self.vb1)
+        self._display_sim_state("finish", self.vb2)
 
-    def run(self) -> None:
+    def _init_scene(self) -> None:
         """
-        Start visualization of simulation.
+        Initialize the scene (canvas and viewboxes) for visualization.
         """
-        self.canvas.app.run()
+        self.canvas = scene.SceneCanvas(keys='interactive', bgcolor='black',
+                           size=(1200, 750), show=True, fullscreen=True)
+        self.vb1 = scene.widgets.ViewBox(border_color='gray', parent=self.canvas.scene)
+        self.vb2 = scene.widgets.ViewBox(border_color='gray', parent=self.canvas.scene)
+        # grid layout
+        grid = self.canvas.central_widget.add_grid()
+        grid.padding = 10
+        grid.add_widget(self.vb1, 0, 0)
+        grid.add_widget(self.vb2, 0, 1)
+        # camera setup
+        self.vb1.camera = 'arcball'
+        self.vb1.camera.set_range(x=[-20, 20], y=[-20, 20], z=[-20, 20])
+        self.vb2.camera = 'arcball'
+        self.vb2.camera.set_range(x=[-20, 20], y=[-20, 20], z=[-20, 20])
+
+    def _display_sim_state (self, sim_time : str, viewbox) -> None:
+        """
+        Display the selected state of the simulation in the given viewbox.
+
+        Args:
+            sim_time (str): Time state of the simulation (e.g. "start" or "finish").
+            viewbox: The viewbox in which to display the state.
+        """
+        self.atoms = self.ions + self.electrodes
+        for atom in self.atoms:
+            atom.display(viewbox, sim_time)        
 
     def _calc_gyration (self) -> float:
         """
-        Calculates radius of gyration of the molecule.
+        Calculate the radius of gyration of the molecule.
 
         Returns:
-            float: radius of the gyration
+            float: The radius of gyration.
         """
         atoms = self.electrodes + self.ions
         com = self._center_of_mass(atoms)
@@ -132,13 +134,13 @@ class Simulation ():
 
     def _center_of_mass (self, atoms : list) -> np.array:
         """
-        Calculates a center of mass of the molecule.
+        Calculate the center of mass of the molecule.
 
         Args:
-            atoms (list): list of all atoms in simulation
+            atoms (list): List of all atoms in the simulation.
 
         Returns:
-            np.array: a center of mass position
+            np.array: The center of mass position.
         """
         pos_sum = np.array([0, 0, 0])
         for atom in atoms:
@@ -147,7 +149,7 @@ class Simulation ():
 
     def _gyration_to_db (self) -> None:
         """
-        Save N and Rg to a database.
+        Save N and Rg to the database.
         """
         with open ("database.txt", "a+") as f:
             line = f"{self._radius_of_gyration} {self.atoms_num}\n"

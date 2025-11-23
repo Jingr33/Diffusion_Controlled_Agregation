@@ -1,11 +1,9 @@
 import config
 import numpy as np
-import math
-import random
 
 class LayoutGenerator ():
     """
-    Generate list of 3D vector for atom starting positions.
+    Generate a list of 3D vectors representing starting positions for atoms.
     """
 
     def __init__(self, layout : str, atoms_num : int):
@@ -13,8 +11,8 @@ class LayoutGenerator ():
         Initialize LayoutGenerator.
 
         Args:
-            laout (str): type of starting layout (cube, sphere, random)
-            atoms_num (int): number of atoms in system
+            layout (str): type of starting layout ("cube", "sphere", or "random").
+            atoms_num (int): number of atoms in the system.
         """
         self.atoms_num = atoms_num      
         if (layout == config.layout_choices[0]):
@@ -23,39 +21,46 @@ class LayoutGenerator ():
             self.start_postions = self._gen_sphere_layout()
         elif (layout == config.layout_choices[2]):
             self.start_postions = self._gen_random_layout()
-        
+
+    def get_start_pos (self) -> list:
+        """
+        Return the list of starting positions for free ions.
+        """
+        return self.start_postions
+
     def _gen_cube_layout(self) -> list:
         """
-        Generate random layout of atoms on the surface of the cube.
+        Generate a random layout of atoms on the surface of a cube.
 
         Returns:
-            list[np.array]: list of positions for every free ion in the start of the simulation
+            list[np.array]: List of positions for each free ion at the start of the simulation.
         """
         coord_list = [None] * self.atoms_num
-        half_edge = np.pow(self.atoms_num, 0.56)
+        half_edge = np.power(self.atoms_num, 0.56)
         for i in range(self.atoms_num):
-            rnd_coord = random.randint(0, 2)
-            rnd_side = random.choice([-1, 1])
+            rnd_coord = np.random.randint(0, 3)
+            rnd_side = np.random.choice([-1, 1])
             position = np.array([0.0, 0.0, 0.0])
             position[rnd_coord] = half_edge * rnd_side
             for j in range(len(position)):
-                if (position[j] != 0): continue
-                position[j] = random.uniform(-half_edge, half_edge)
+                if position[j] != 0:
+                    continue
+                position[j] = np.random.uniform(-half_edge, half_edge)
             coord_list[i] = position
         return coord_list
 
     def _gen_sphere_layout(self) -> list:
         """
-        Generate random layout of atoms on the surface of the sphere.
+        Generate a random layout of atoms on the surface of a sphere.
 
         Returns:
-            list[np.array]: list of positions for every free ion in the start of the simulation
+            list[np.array]: List of positions for each free ion at the start of the simulation.
         """
         coord_list = [None] * self.atoms_num
-        r = np.pow(self.atoms_num, 0.5) * 2
+        r = np.power(self.atoms_num, 0.5) * 2
         for i in range(self.atoms_num):
-            phi = random.uniform(0, np.pi)
-            theta = random.uniform(0, 2*np.pi)
+            phi = np.random.uniform(0, np.pi)
+            theta = np.random.uniform(0, 2 * np.pi)
             x = r * np.cos(phi) * np.sin(theta)
             y = r * np.sin(phi) * np.sin(theta)
             z = r * np.cos(theta)
@@ -64,22 +69,17 @@ class LayoutGenerator ():
 
     def _gen_random_layout(self) -> list:
         """
-        Generate random layout of atoms in the space.
+        Generate a random layout of atoms in space.
 
         Returns:
-            list[np.array]: list of positions for every free ion in the start of the simulation
+            list[np.array]: List of positions for each free ion at the start of the simulation.
         """
-        max_radius = math.ceil(math.pow(self.atoms_num, 0.5))
+        max_radius = int(np.ceil(np.power(self.atoms_num, 0.5)))
         coord_list = [None] * self.atoms_num
         for i in range(self.atoms_num):
-            x = random.randint(-max_radius, max_radius + 1)
-            y = random.randint(-max_radius, max_radius + 1)
-            z = random.randint(-max_radius, max_radius + 1)
+            x = np.random.randint(-max_radius, max_radius + 1)
+            y = np.random.randint(-max_radius, max_radius + 1)
+            z = np.random.randint(-max_radius, max_radius + 1)
             coord_list[i] = np.array([x, y, z])
         return coord_list
     
-    def get_start_pos (self) -> list:
-        """
-        Return list of free ions start positions.
-        """
-        return self.start_postions

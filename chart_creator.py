@@ -4,16 +4,16 @@ import numpy as np
 
 class ChartCreator ():
     """
-    Create chart in the end of app run.
+    Create a chart at the end of the application run.
 
     Chart content:
-        log N (number of particled in simulation) vs. log Rg (gyration radius)
-        fractal dimension of dendrimers created from some layout
+        log N (number of particles in the simulation) vs. log Rg (gyration radius).
+        Shows the estimated fractal dimension of dendrimers created from a layout.
     """
 
     def __init__(self):
         """
-        Initialize chart creator.
+        Initialize the chart creator.
         """
         self.atoms_numbers = []
         self.gyrations = []
@@ -23,7 +23,7 @@ class ChartCreator ():
 
     def _load_data (self) -> None:
         """
-        Load data from a database.
+        Load data from the database file.
         """
         lines = []
         with open ("database_cube.txt", "r+") as f:
@@ -35,7 +35,7 @@ class ChartCreator ():
 
     def _calc_data (self) -> None:
         """
-        Prepares data for the chart and calculates  fractal dimension fo the dendrimers.
+        Prepare data for the chart and calculate the fractal dimension of the dendrimers.
         """
         self.log_N = np.log10(self.atoms_numbers)
         self.log_Rg = np.log10(self.gyrations)
@@ -45,7 +45,7 @@ class ChartCreator ():
 
     def _plot(self) -> None:
         """
-        Plot data.
+        Plot the data.
         """
         plt.scatter(self.log_Rg, self.log_N, color="#3288bd")
         plt.plot(self.log_Rg, self.p(self.log_Rg), linestyle="dotted")
