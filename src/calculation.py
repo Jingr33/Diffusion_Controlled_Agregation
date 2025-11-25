@@ -1,26 +1,26 @@
-import config
 import numpy as np
 
+import config
 
 class Calculation ():
     """
     This class manages all numerical calculations for the simulation.
 
     Attributes:
-        master (Simulation): Parent simulation instance.
+        simulation (Simulation): Parent simulation instance.
         ions (list): List of all ion objects in the simulation.
         electrodes (list): List of all electrode objects in the simulation.
     """
-    def __init__(self, master) -> None:
+    def __init__(self, simulation) -> None:
         """
         Initialize the Calculation helper.
 
         Args:
             master (Simulation): Parent simulation instance.
         """
-        self.master = master
-        self.ions = master.ions
-        self.electrodes = master.electrodes
+        self.master = simulation
+        self.ions = simulation.ions
+        self.electrodes = simulation.electrodes
 
     def calculate_sim (self) -> None:
         """
@@ -32,11 +32,11 @@ class Calculation ():
         while len(self.ions) != 0:
             for ion in self.ions:
                 shortest_dist, nearest_elec = self._shortest_electrode_dist(ion)
-                if (self._is_electrode(ion, nearest_elec)):
+                if self._is_electrode(ion, nearest_elec):
                     continue
                 ion.electrode_dist = shortest_dist
                 shift_vec = self._gen_biased_vector(ion, nearest_elec)
-                ion.update_position(ion.position + shift_vec * config.step)
+                ion.update_position(ion.position + shift_vec * config.STEP)
 
     def final_pos_optimalization (atom) -> np.array:
         """
@@ -52,10 +52,10 @@ class Calculation ():
         electrode_pos = atom.parent_electrode.position
         elec_to_ion = np.array(atom.position - electrode_pos)
         distance = np.linalg.norm(elec_to_ion)
-        if (distance == 0):
+        if distance == 0:
             return np.array(atom.position)
         norm_elec_to_ion = np.array(elec_to_ion / distance)
-        return np.array(electrode_pos + norm_elec_to_ion * 2 * config.atom_radius)
+        return np.array(electrode_pos + norm_elec_to_ion * 2 * config.ATOM_RADIUS)
 
 
     def vec_magnitude (vector : np.array) -> float:
@@ -69,7 +69,7 @@ class Calculation ():
             float: Magnitude of the vector.
         """
         return np.linalg.norm(vector)
-    
+
     def opposite_direction (vector : np.array) -> np.array:
         """
         Return the opposite direction of a 3D vector.
@@ -97,7 +97,7 @@ class Calculation ():
         nearest_elec = self.master.electrode
         for electrode in self.electrodes:
             actual_distance = np.linalg.norm(ion.position - electrode.position)
-            if (actual_distance < shortest_dist):
+            if actual_distance < shortest_dist:
                 shortest_dist = actual_distance
                 nearest_elec = electrode
         return shortest_dist, nearest_elec
@@ -117,10 +117,10 @@ class Calculation ():
         Returns:
             bool: True if the ion was transformed into an electrode; otherwise False.
         """
-        if (ion.electrode_dist <= config.atom_radius*2 + config.step/2):
+        if ion.electrode_dist <= config.ATOM_RADIUS*2 + config.STEP/2:
+            self.ions.remove(ion)
             ion.transform_to_electrode(nearest_electrode)
             self.electrodes.append(ion)
-            self.ions.remove(ion)
             return True
         return False
 
@@ -139,7 +139,7 @@ class Calculation ():
         Returns:
             np.array: Normalized motion vector for the atom.
         """
-        probability = config.direc_prob
+        probability = config.DIREC_PROB
         pref_direc = nearest_electrode.position - ion.position
         norm_pref_direc = pref_direc / np.linalg.norm(pref_direc)
         rand_direc = np.random.randn(3)

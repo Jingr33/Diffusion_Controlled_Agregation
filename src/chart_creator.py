@@ -26,7 +26,7 @@ class ChartCreator ():
         Load data from the database file.
         """
         lines = []
-        with open ("database_cube.txt", "r+") as f:
+        with open ("database_cube.txt", "r+", encoding="utf-8") as f:
             lines = f.readlines()
         for line in lines:
             data = line.split(" ")
@@ -37,9 +37,9 @@ class ChartCreator ():
         """
         Prepare data for the chart and calculate the fractal dimension of the dendrimers.
         """
-        self.log_N = np.log10(self.atoms_numbers)
-        self.log_Rg = np.log10(self.gyrations)
-        coeffs = np.polyfit(self.log_Rg, self.log_N, 1)
+        self.log_n = np.log10(self.atoms_numbers)
+        self.log_rg = np.log10(self.gyrations)
+        coeffs = np.polyfit(self.log_rg, self.log_n, 1)
         self.p = np.poly1d(coeffs)
         self.fractal_dimension = np.round(coeffs[0], 4)
 
@@ -47,8 +47,8 @@ class ChartCreator ():
         """
         Plot the data.
         """
-        plt.scatter(self.log_Rg, self.log_N, color="#3288bd")
-        plt.plot(self.log_Rg, self.p(self.log_Rg), linestyle="dotted")
+        plt.scatter(self.log_rg, self.log_n, color="#3288bd")
+        plt.plot(self.log_rg, self.p(self.log_rg), linestyle="dotted")
         plt.title(f"Závislost logaritmu počtu atomů na logaritmu gyračního poloměru\nFraktální dimenze Df = {self.fractal_dimension}")
         plt.xlabel("log Rg")
         plt.ylabel("log N")

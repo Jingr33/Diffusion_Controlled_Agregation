@@ -1,5 +1,6 @@
-import config
 import numpy as np
+
+import config
 
 class LayoutGenerator ():
     """
@@ -14,12 +15,12 @@ class LayoutGenerator ():
             layout (str): type of starting layout ("cube", "sphere", or "random").
             atoms_num (int): number of atoms in the system.
         """
-        self.atoms_num = atoms_num      
-        if (layout == config.layout_choices[0]):
+        self.atoms_num = atoms_num
+        if layout == config.LAYOUTS[0]:
             self.start_postions = self._gen_cube_layout()
-        elif (layout == config.layout_choices[1]):
+        elif layout == config.LAYOUTS[1]:
             self.start_postions = self._gen_sphere_layout()
-        elif (layout == config.layout_choices[2]):
+        elif layout == config.LAYOUTS[2]:
             self.start_postions = self._gen_random_layout()
 
     def get_start_pos (self) -> list:
