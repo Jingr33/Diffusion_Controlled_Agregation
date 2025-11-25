@@ -8,6 +8,7 @@ from simulation import Simulation
 from visualizer import Visualizer
 from chart_creator import ChartCreator
 from config import *
+from database.db_runner import DbRunner
 
 def main():
     parser = argparse.ArgumentParser(description = "Difuzně řízená agregace")
@@ -17,6 +18,7 @@ def main():
     parser.add_argument("--plot", action="store_true", default=PLOT_DFAULT, help = "Zobrazí graf početu atomů proti gyračnímu poloměru")
     parser.add_argument("--sim", action="store_true", default=SIM_DEFAULT, help = "Spustí simulaci")
     args = parser.parse_args()
+    DbRunner()
     _start_sim(args.layout, args.atoms, args.visualize, args.sim)
     _plot_chart(args.plot)
 
