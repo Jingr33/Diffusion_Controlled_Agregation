@@ -41,7 +41,7 @@ class Visualizer():
                            size=(1200, 750), show=True, fullscreen=True)
         grid = self.canvas.central_widget.add_grid()
         grid.padding = 10
-        for i in range(len(self.atoms)):
+        for i in range(len(self.sim_data)):
             vb_left = scene.widgets.ViewBox(border_color='gray', parent=self.canvas.scene)
             vb_right = scene.widgets.ViewBox(border_color='gray', parent=self.canvas.scene)
             # grid layout

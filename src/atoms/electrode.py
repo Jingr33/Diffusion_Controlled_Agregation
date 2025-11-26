@@ -35,8 +35,8 @@ class Electrode(AtomBase):
             view (vispy.scene.visuals): View window for the simulation.
             sim_time (str): START or FINISH (initial or final state).
         """
+        position = self.positions_list[0] if sim_time == SimStateType.START else self.positions_list[-1]
         generation = self.generation if sim_time != SimStateType.START else self.orig_generation
-        position = self.positions_list[0] if sim_time == SimStateType.FINISH else self.positions_list[-1]
         self.color = self._set_fg_color(generation)
         self._display_sphere(view, position)
 
