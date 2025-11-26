@@ -8,11 +8,12 @@ from simulation import Simulation
 from visualizer import Visualizer
 from chart_creator import ChartCreator
 from config import *
+from layout.layout import Layout
 from database.db_runner import DbRunner
 
 def main():
     parser = argparse.ArgumentParser(description = "Difuzně řízená agregace")
-    parser.add_argument("--layout", type=str, choices = LAYOUTS, default = LAYOUT_DEFAULT, help = "Typ počátečního rozdělení molekul (cube, sphere, random)")
+    parser.add_argument("--layout", type=Layout, choices = list(Layout), default = LAYOUT_DEFAULT, help = "Typ počátečního rozdělení molekul (cube, sphere, random)")
     parser.add_argument("--atoms", nargs='+', type=int, default = ATOMS_DEFAULT, help = "Počet atomů v simulaci")
     parser.add_argument("--visualize", action="store_true", default=VISUALIZATION_DEFAULT, help = "Zobrazí vizualizaci počátečního a koncového stavu")
     parser.add_argument("--plot", action="store_true", default=PLOT_DFAULT, help = "Zobrazí graf početu atomů proti gyračnímu poloměru")
@@ -20,7 +21,7 @@ def main():
     args = parser.parse_args()
     DbRunner()
     _start_sim(args.layout, args.atoms, args.visualize, args.sim)
-    _plot_chart(args.plot)
+    _plot_chart(args.plot, args.layout)
 
 def _start_sim (layout : str, atom_numbers : list, visualize : bool, simulation : bool) -> None:
     """
@@ -45,7 +46,7 @@ def _start_sim (layout : str, atom_numbers : list, visualize : bool, simulation 
         visualizer.visualize_simulation()
 
 
-def _plot_chart (plot : bool) -> None:
+def _plot_chart (plot : bool, layout : Layout) -> None:
     """
     Plot the results chart.
 
@@ -56,7 +57,7 @@ def _plot_chart (plot : bool) -> None:
         plot (bool): Whether plotting the chart is enabled.
     """
     if plot:
-        ChartCreator()
+        ChartCreator(layout)
 
 
 if __name__ == '__main__':

@@ -2,9 +2,11 @@
 Configuration of the app.
 """
 
+from layout.layout import Layout
+
 # ARGUMENTS
-LAYOUTS = ["cube", "sphere", "random"]
-LAYOUT_DEFAULT = LAYOUTS[1]
+LAYOUTS = list(Layout)
+LAYOUT_DEFAULT = Layout.CUBE
 ATOMS_DEFAULT = [10, 100]
 SIM_DEFAULT = True
 VISUALIZATION_DEFAULT = True

@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+from DI_container import injector
+from layout.layout import Layout
+from database.services.gyration_ratio_service import GyrationRatioService
+
 
 class ChartCreator ():
     """
@@ -11,27 +15,32 @@ class ChartCreator ():
         Shows the estimated fractal dimension of dendrimers created from a layout.
     """
 
-    def __init__(self):
+    def __init__(self, layout : Layout):
         """
         Initialize the chart creator.
         """
+        self._gyratio_ratio_service = injector.get(GyrationRatioService)
+        self.layout = layout
         self.atoms_numbers = []
         self.gyrations = []
-        self._load_data()
+        self._load_simulation_data_from_db()
         self._calc_data()
         self._plot()
 
-    def _load_data (self) -> None:
+    def _load_simulation_data_from_db (self) -> None:
         """
-        Load data from the database file.
+        Load data from the database.
         """
-        lines = []
-        with open ("database_cube.txt", "r+", encoding="utf-8") as f:
-            lines = f.readlines()
-        for line in lines:
-            data = line.split(" ")
-            self.gyrations.append(float(data[0]))
-            self.atoms_numbers.append(int(data[1]))
+        simulation_data = self._gyratio_ratio_service.get_all_gyration_ratios_with_layout(self.layout)
+        self.gyrations = [
+            (
+                x.cube_gr if self.layout == Layout.CUBE
+                else x.sphere_gr if self.layout == Layout.SPHERE
+                else x.random_gr
+            )
+            for x in simulation_data
+        ]
+        self.atoms_numbers = [x.atoms for x in simulation_data]
 
     def _calc_data (self) -> None:
         """
@@ -52,4 +61,4 @@ class ChartCreator ():
         plt.title(f"Závislost logaritmu počtu atomů na logaritmu gyračního poloměru\nFraktální dimenze Df = {self.fractal_dimension}")
         plt.xlabel("log Rg")
         plt.ylabel("log N")
-        plt.show()
+        plt.show(block=True)

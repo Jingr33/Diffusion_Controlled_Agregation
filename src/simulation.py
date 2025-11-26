@@ -1,9 +1,12 @@
 import numpy as np
 
-from layout_generator import LayoutGenerator
+from DI_container import injector
+from layout.layout import Layout
+from layout.layout_generator import LayoutGenerator
 from calculation import Calculation
 from atoms.electrode import Electrode
 from atoms.ion import Ion
+from database.services.gyration_ratio_service import GyrationRatioService
 
 
 class Simulation ():
@@ -25,6 +28,7 @@ class Simulation ():
             layout (str): Starting layout of the simulation.
             atoms_num (int): Number of atoms in the simulation.
         """
+        self._gyratio_ratio_service = injector.get(GyrationRatioService)
         self.layout = layout
         self.atoms_num = atoms_num
         self.ions = []
@@ -33,7 +37,7 @@ class Simulation ():
         self.electrode = self._generate_elecrode()
         self._calculate_simulation()
         self._radius_of_gyration = self._calc_gyration()
-        self._gyration_to_db()
+        self._save_to_db()
 
     def get_atoms(self) -> list:
         """
@@ -100,10 +104,13 @@ class Simulation ():
             pos_sum = pos_sum + atom.position
         return np.array(pos_sum / self.atoms_num)
 
-    def _gyration_to_db (self) -> None:
+    def _save_to_db (self) -> None:
         """
         Save N and Rg to the database.
         """
-        with open ("database.txt", "a+", encoding="utf-8") as f:
-            line = f"{self._radius_of_gyration} {self.atoms_num}\n"
-            f.write(line)
+        self._gyratio_ratio_service.add_or_update_gyration_ratio(
+            atoms = self.atoms_num,
+            cube_gr = self._radius_of_gyration if self.layout == Layout.CUBE else None,
+            sphere_gr = self._radius_of_gyration if self.layout == Layout.SPHERE else None,
+            random_gr = self._radius_of_gyration if self.layout == Layout.RANDOM else None,
+        )
