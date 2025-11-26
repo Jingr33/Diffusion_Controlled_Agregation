@@ -56,6 +56,9 @@ class ChartCreator ():
         """
         Plot the data.
         """
+        if self.log_rg.size <= 0 or self.log_n.size <= 0:
+            print("No data to plot.")
+            return
         plt.scatter(self.log_rg, self.log_n, color="#3288bd")
         plt.plot(self.log_rg, self.p(self.log_rg), linestyle="dotted")
         plt.title(f"Závislost logaritmu počtu atomů na logaritmu gyračního poloměru\nFraktální dimenze Df = {self.fractal_dimension}")
