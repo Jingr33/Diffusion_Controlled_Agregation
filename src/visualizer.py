@@ -26,6 +26,9 @@ class Visualizer():
         """
         Visualize the start and end states of the simulation (if enabled).
         """
+        if len(self.sim_data) <= 0:
+            print("No simulation data to visualize.")
+            return
         self._init_scene()
         for i in range(len(self.view_boxes)):
             vb_group = self.view_boxes[i]

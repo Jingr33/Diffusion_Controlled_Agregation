@@ -10,6 +10,7 @@ from chart_creator import ChartCreator
 from config import *
 from layout.layout import Layout
 from database.db_runner import DbRunner
+from database.db_cleaner import DbCleaner
 
 def main():
     parser = argparse.ArgumentParser(description = "Difuzně řízená agregace")
@@ -18,8 +19,10 @@ def main():
     parser.add_argument("--visualize", action="store_true", default=VISUALIZATION_DEFAULT, help = "Zobrazí vizualizaci počátečního a koncového stavu")
     parser.add_argument("--plot", action="store_true", default=PLOT_DFAULT, help = "Zobrazí graf početu atomů proti gyračnímu poloměru")
     parser.add_argument("--sim", action="store_true", default=SIM_DEFAULT, help = "Spustí simulaci")
+    parser.add_argument("--clean_db", action="store_true", default=CLEAN_DB_DEFAULT, help = "Vyčistí databázi před spuštěním simulace")
     args = parser.parse_args()
     DbRunner()
+    DbCleaner(args.clean_db)
     _start_sim(args.layout, args.atoms, args.visualize, args.sim)
     _plot_chart(args.plot, args.layout)
 

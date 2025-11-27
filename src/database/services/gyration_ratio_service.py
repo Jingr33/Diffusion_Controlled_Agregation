@@ -30,3 +30,9 @@ class GyrationRatioService():
         if layout == Layout.RANDOM:
             return [gr for gr in all_gyration_ratios if gr.random_gr is not None]
         return []
+
+    def delete_all_data(self) -> None:
+        """
+        Delete all entries from the gyration ratio table.
+        """
+        self._gyration_ratio_repo.delete_all()
