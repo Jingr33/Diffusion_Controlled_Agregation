@@ -5,3 +5,4 @@ simulation.txt
 __pycache*
 .vscode
 TODO
+.env

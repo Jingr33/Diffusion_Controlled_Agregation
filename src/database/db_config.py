@@ -2,21 +2,11 @@ import os
 
 ENV = os.getenv("APP_ENV", "dev")
 
-if ENV == "dev":
-    DB_CONFIG = {
-        "driver": "{ODBC Driver 17 for SQL Server}",
-        "server": "LAPTOP-3BB5L61H\SQLEXPRESS",
-        "database": "DiffusionControlledAgregationDB",
-        "database_master": "master",
-        "uid": "LAPTOP-3BB5L61H\jirka",
-        "pwd": "root"
-    }
-else:
-    DB_CONFIG = {
-        "driver": "{ODBC Driver 17 for SQL Server}",
-        "server": "db",
-        "database": "DiffusionControlledAgregationDB",
-        "database_master": "master",
-        "uid": "sa",
-        "pwd": "MojeHeslo123!"
-    }
+DB_CONFIG = {
+    "driver": os.getenv("DB_DRIVER", "{ODBC Driver 17 for SQL Server}"),
+    "server": os.getenv("DB_SERVER", "localhost"),
+    "database": os.getenv("DB_NAME", "DiffusionControlledAgregationDB"),
+    "database_master": os.getenv("DB_MASTER_NAME", "master"),
+    "uid": os.getenv("DB_USER", "sa"),
+    "pwd": os.getenv("DB_PASS", ""),
+}
