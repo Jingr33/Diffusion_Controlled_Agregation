@@ -1,0 +1,7 @@
+alembic>=1.16.5
+SQLAlchemy>=2.0.43
+vispy==0.14.3
+numpy>=1.26.4
+injector>=0.22.0
+pyodbc>=5.1.0
+matplotlib>=3.8.0
