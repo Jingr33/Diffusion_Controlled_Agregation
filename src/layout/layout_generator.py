@@ -1,6 +1,7 @@
 import numpy as np
 
 import config
+from layout.layout import Layout
 
 class LayoutGenerator ():
     """
@@ -16,11 +17,11 @@ class LayoutGenerator ():
             atoms_num (int): number of atoms in the system.
         """
         self.atoms_num = atoms_num
-        if layout == config.LAYOUTS[0]:
+        if layout == Layout.CUBE:
             self.start_postions = self._gen_cube_layout()
-        elif layout == config.LAYOUTS[1]:
+        elif layout == Layout.SPHERE:
             self.start_postions = self._gen_sphere_layout()
-        elif layout == config.LAYOUTS[2]:
+        elif layout == Layout.RANDOM:
             self.start_postions = self._gen_random_layout()
 
     def get_start_pos (self) -> list:

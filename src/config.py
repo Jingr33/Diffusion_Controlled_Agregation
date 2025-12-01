@@ -5,13 +5,12 @@ Configuration of the app.
 from layout.layout import Layout
 
 # ARGUMENTS
-LAYOUTS = list(Layout)
-LAYOUT_DEFAULT = Layout.CUBE
-ATOMS_DEFAULT = [1,2 ,3,4,5,6,7,8,9,10,11,12,13,14,15]
+LAYOUT_DEFAULT = Layout.RANDOM
+ATOMS_DEFAULT = [10, 100]
 SIM_DEFAULT = True
 VISUALIZATION_DEFAULT = True
 PLOT_DFAULT = True
-CLEAN_DB_DEFAULT = False
+CLEAN_DB_DEFAULT = True
 
 #COLORS
 ATOM_EDGE_COLOR = (0.5, 0.5, 0.5, 0.5)
