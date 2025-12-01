@@ -17,46 +17,45 @@ class AtomBase(ABC):
         sphere: Visual representation of the atom as a sphere.
         color: Color of the atom for visualization.
     """
-    def __init__(self, position : np.array) -> None:
+    def __init__(self, position: np.ndarray) -> None:
         """
         Initialize an Atom instance.
 
         Args:
-            position (np.array): 3D position of the atom in space.
+            position (np.ndarray): 3D position of the atom in space [x, y, z].
         """
         self.position = position
         self.positions_list = [self.position]
         self.sphere = None
         self.color = None
 
-    def update_position(self, new_position : np.array) -> None:
+    def update_position(self, new_position: np.ndarray) -> None:
         """
-        Update the atom's current position.
+        Update the atom's current position and record it in history.
 
         Args:
-            new_position (np.array): New 3D position of the atom.
+            new_position (np.ndarray): New 3D position of the atom [x, y, z].
         """
         self.position = new_position
         self.positions_list.append(new_position)
 
     @abstractmethod
-    def display(self, view, sim_time : str) -> None:
+    def display(self, view, sim_time: str) -> None:
         """
         Display this atom in the given view for a specified simulation time.
 
         Args:
             view: The vispy view/window to render into.
-            sim_time (str): Either START or FINISH to indicate which
-                state to display.
+            sim_time (str): Either START or FINISH to indicate which state to display.
         """
 
-    def _display_sphere(self, view, position : np.array) -> None:
+    def _display_sphere(self, view, position: np.ndarray) -> None:
         """
         Create and place the sphere visual for this atom.
 
         Args:
             view: The vispy view/window to render into.
-            position (np.array): 3D position where the sphere should be placed.
+            position (np.ndarray): 3D position where the sphere should be placed [x, y, z].
         """
         self.sphere = scene.visuals.Sphere(
             radius=config.ATOM_RADIUS,
@@ -67,24 +66,23 @@ class AtomBase(ABC):
             )
         self._translate_sphere(position)
 
-    def _translate_sphere (self, pos : np.array) -> None:
+    def _translate_sphere(self, pos: np.ndarray) -> None:
         """
         Place or move the atom's visual sphere to the given position.
 
         Args:
-            pos (np.array): 3D position of the atom in space.
+            pos (np.ndarray): 3D position of the atom in space [x, y, z].
         """
         self.sphere.transform = STTransform(translate=[pos[0], pos[1], pos[2]])
 
     @abstractmethod
-    def _set_fg_color (self, generation : Optional[int] = None) -> Any:
+    def _set_fg_color(self, generation: Optional[int] = None) -> Any:
         """
         Determine the atom color based on its generation in the dendrimer.
 
         Args:
-            generation (Optional[int]): Generation index (use -1 for a free ion, or
-                None if generation is not available).
+            generation (Optional[int]): Generation index (-1 for free ion, or None if unavailable).
 
         Returns:
-            Any: Color specification for the atom (format taken from config).
+            Any: Color specification for the atom (format from config).
         """

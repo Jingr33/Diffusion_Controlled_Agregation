@@ -17,7 +17,7 @@ def main():
     parser.add_argument("--layout", type=Layout, choices = list(Layout), default = LAYOUT_DEFAULT, help = "Typ počátečního rozdělení molekul (cube, sphere, random)")
     parser.add_argument("--atoms", nargs='+', type=int, default = ATOMS_DEFAULT, help = "Počet atomů v simulaci")
     parser.add_argument("--visualize", action="store_true", default=VISUALIZATION_DEFAULT, help = "Zobrazí vizualizaci počátečního a koncového stavu")
-    parser.add_argument("--plot", action="store_true", default=PLOT_DFAULT, help = "Zobrazí graf početu atomů proti gyračnímu poloměru")
+    parser.add_argument("--plot", action="store_true", default=PLOT_DEFAULT, help = "Zobrazí graf závislosti počtu atomů na gyračním poloměru")
     parser.add_argument("--sim", action="store_true", default=SIM_DEFAULT, help = "Spustí simulaci")
     parser.add_argument("--clean_db", action="store_true", default=CLEAN_DB_DEFAULT, help = "Vyčistí databázi před spuštěním simulace")
     args = parser.parse_args()
@@ -26,7 +26,7 @@ def main():
     _start_sim(args.layout, args.atoms, args.visualize, args.sim)
     _plot_chart(args.plot, args.layout)
 
-def _start_sim (layout : str, atom_numbers : list, visualize : bool, simulation : bool) -> None:
+def _start_sim(layout: str, atom_numbers: list[int], visualize: bool, simulation: bool) -> None:
     """
     Start simulation and visualization.
 
@@ -34,7 +34,7 @@ def _start_sim (layout : str, atom_numbers : list, visualize : bool, simulation 
     initial and final states and the system's gyration radius.
 
     Args:
-        layout (str): Start positions of the ions ("cube", "sphere" or "random").
+        layout (str): Starting layout of free ions ("cube", "sphere" or "random").
         atom_numbers (list[int]): List of atom counts for the simulation.
         visualize (bool): Whether to visualize the initial and final state.
         simulation (bool): Whether to run the simulation process.
@@ -49,7 +49,7 @@ def _start_sim (layout : str, atom_numbers : list, visualize : bool, simulation 
         visualizer.visualize_simulation()
 
 
-def _plot_chart (plot : bool, layout : Layout) -> None:
+def _plot_chart(plot: bool, layout: Layout) -> None:
     """
     Plot the results chart.
 
@@ -58,6 +58,7 @@ def _plot_chart (plot : bool, layout : Layout) -> None:
 
     Args:
         plot (bool): Whether plotting the chart is enabled.
+        layout (Layout): Type of layout used in the simulation.
     """
     if plot:
         ChartCreator(layout)

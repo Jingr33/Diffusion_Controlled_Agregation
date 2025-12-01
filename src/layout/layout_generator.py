@@ -8,13 +8,13 @@ class LayoutGenerator ():
     Generate a list of 3D vectors representing starting positions for atoms.
     """
 
-    def __init__(self, layout : str, atoms_num : int):
+    def __init__(self, layout: str, atoms_num: int):
         """
         Initialize LayoutGenerator.
 
         Args:
-            layout (str): type of starting layout ("cube", "sphere", or "random").
-            atoms_num (int): number of atoms in the system.
+            layout (str): Type of starting layout ("cube", "sphere", or "random").
+            atoms_num (int): Number of atoms in the system.
         """
         self.atoms_num = atoms_num
         if layout == Layout.CUBE:
@@ -24,18 +24,21 @@ class LayoutGenerator ():
         elif layout == Layout.RANDOM:
             self.start_postions = self._gen_random_layout()
 
-    def get_start_pos (self) -> list:
+    def get_start_pos(self) -> list:
         """
         Return the list of starting positions for free ions.
+
+        Returns:
+            list: List of np.ndarray positions [x, y, z] for each ion.
         """
         return self.start_postions
 
     def _gen_cube_layout(self) -> list:
         """
-        Generate a random layout of atoms on the surface of a cube.
+        Generate a random layout of ions on the surface of a cube.
 
         Returns:
-            list[np.array]: List of positions for each free ion at the start of the simulation.
+            list[np.ndarray]: List of 3D positions for each free ion at simulation start.
         """
         coord_list = [None] * self.atoms_num
         half_edge = np.power(self.atoms_num, 0.56)
@@ -53,10 +56,10 @@ class LayoutGenerator ():
 
     def _gen_sphere_layout(self) -> list:
         """
-        Generate a random layout of atoms on the surface of a sphere.
+        Generate a random layout of ions on the surface of a sphere.
 
         Returns:
-            list[np.array]: List of positions for each free ion at the start of the simulation.
+            list[np.ndarray]: List of 3D positions for each free ion at simulation start.
         """
         coord_list = [None] * self.atoms_num
         r = np.power(self.atoms_num, 0.5) * 2
@@ -71,10 +74,10 @@ class LayoutGenerator ():
 
     def _gen_random_layout(self) -> list:
         """
-        Generate a random layout of atoms in space.
+        Generate a random layout of ions in space.
 
         Returns:
-            list[np.array]: List of positions for each free ion at the start of the simulation.
+            list[np.ndarray]: List of 3D positions for each free ion at simulation start.
         """
         max_radius = int(np.ceil(np.power(self.atoms_num, 0.5)))
         coord_list = [None] * self.atoms_num

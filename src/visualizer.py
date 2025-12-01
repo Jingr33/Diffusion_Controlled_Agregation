@@ -5,26 +5,29 @@ class Visualizer():
     """
     Manages visualization.
     """
-    def __init__(self, atoms : list[int]):
+    def __init__(self, atoms: list[int]):
         """
         Initialize a visualizer object.
         
         Args:
-            is_visualization (bool): Wether visualization is enabled.
+            atoms (list[int]): List of atom counts from simulations to visualize.
         """
         self.atoms = atoms
         self.view_boxes = []
         self.sim_data = []
 
-    def set_simulation_data(self, simulation_data : list) -> None:
+    def set_simulation_data(self, simulation_data: list) -> None:
         """
-        Append simulation data into self.sim_data
+        Append simulation data (atoms) to internal storage for visualization.
+
+        Args:
+            simulation_data (list): List of all atoms (ions and electrodes) from a simulation.
         """
         self.sim_data.append(simulation_data)
 
     def visualize_simulation(self) -> None:
         """
-        Visualize the start and end states of the simulation (if enabled).
+        Display the initial and final states of all simulations in an interactive visualization.
         """
         if len(self.sim_data) <= 0:
             print("No simulation data to visualize.")
@@ -38,7 +41,9 @@ class Visualizer():
 
     def _init_scene(self) -> None:
         """
-        Initialize the scene (canvas and viewboxes) for visualization.
+        Initialize the scene with canvas and viewboxes for visualization.
+        
+        Creates a 2D grid of viewboxes: left column for initial states, right column for final states.
         """
         self.canvas = scene.SceneCanvas(keys='interactive', bgcolor='black',
                            size=(1200, 750), show=True, fullscreen=True)
@@ -57,14 +62,14 @@ class Visualizer():
             vb_right.camera.set_range(x=[-20, 20], y=[-20, 20], z=[-20, 20])
             self.view_boxes.append((vb_left, vb_right))
 
-    def _display_sim_state (self, sim_time : str, viewbox, idx : int) -> None:
+    def _display_sim_state(self, sim_time: str, viewbox, idx: int) -> None:
         """
         Display the selected state of the simulation in the given viewbox.
 
         Args:
-            sim_time (str): Time state of the simulation (e.g. START or FINISH).
+            sim_time (str): Time state of the simulation (START or FINISH).
             viewbox: The viewbox in which to display the state.
-            index (int): ...
+            idx (int): Index of the simulation in sim_data list.
         """
         atoms = self.sim_data[idx]
         for atom in atoms:

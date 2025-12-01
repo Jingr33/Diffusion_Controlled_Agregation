@@ -16,17 +16,17 @@ class Calculation ():
         Initialize the Calculation helper.
 
         Args:
-            master (Simulation): Parent simulation instance.
+            simulation (Simulation): Parent simulation instance.
         """
         self.master = simulation
         self.ions = simulation.ions
         self.electrodes = simulation.electrodes
 
-    def calculate_sim (self) -> None:
+    def calculate_sim(self) -> None:
         """
-        Perform all simulation steps until all ions become electrodes.
+        Perform all simulation steps until all free ions become electrodes.
 
-        The simulation advances while there is at least one free particle in space;
+        The simulation advances while there is at least one free ion in space;
         otherwise the calculation (and the whole simulation) terminates.
         """
         while len(self.ions) != 0:
@@ -38,16 +38,16 @@ class Calculation ():
                 shift_vec = self._gen_biased_vector(ion, nearest_elec)
                 ion.update_position(ion.position + shift_vec * config.STEP)
 
-    def final_pos_optimalization (atom) -> np.array:
+    @staticmethod
+    def final_pos_optimalization(atom) -> np.ndarray:
         """
-        Optimize a particle's position when the ion is bound to the dendrimer
-        and comes to rest.
+        Optimize a particle's final position when the ion is bound to the dendrimer.
 
         Args:
             atom (Atom): Atom of interest.
 
         Returns:
-            np.array: Adjusted position of the atom in space.
+            np.ndarray: Adjusted position of the atom at exactly 2*ATOM_RADIUS distance from parent.
         """
         electrode_pos = atom.parent_electrode.position
         elec_to_ion = np.array(atom.position - electrode_pos)
@@ -58,27 +58,29 @@ class Calculation ():
         return np.array(electrode_pos + norm_elec_to_ion * 2 * config.ATOM_RADIUS)
 
 
-    def vec_magnitude (vector : np.array) -> float:
+    @staticmethod
+    def vec_magnitude(vector: np.ndarray) -> float:
         """
-        Return the magnitude of a vector.
+        Calculate the magnitude (Euclidean norm) of a vector.
 
         Args:
-            vector (np.array): Input vector.
+            vector (np.ndarray): Input vector.
 
         Returns:
             float: Magnitude of the vector.
         """
         return np.linalg.norm(vector)
 
-    def opposite_direction (vector : np.array) -> np.array:
+    @staticmethod
+    def opposite_direction(vector: np.ndarray) -> tuple:
         """
-        Return the opposite direction of a 3D vector.
+        Calculate the opposite direction of a 3D vector.
 
         Args:
-            vector (np.array): Input vector.
+            vector (np.ndarray): Input vector with three components [x, y, z].
 
         Returns:
-            np.array: Vector pointing in the opposite direction.
+            tuple: Vector pointing in the opposite direction [-x, -y, -z].
         """
         return (-vector[0], -vector[1], -vector[2])
 
@@ -87,11 +89,10 @@ class Calculation ():
         Calculate the distance from an ion to the nearest electrode of the dendrimer.
 
         Args:
-            ion (Atom): Atom of interest.
+            ion (Ion): Free ion of interest.
 
         Returns:
-            float: Shortest distance to the nearest electrode.
-            Atom: The nearest electrode object.
+            tuple: (float, Electrode) - shortest distance and the nearest electrode object.
         """
         shortest_dist = 1000
         nearest_elec = self.master.electrode
@@ -102,17 +103,17 @@ class Calculation ():
                 nearest_elec = electrode
         return shortest_dist, nearest_elec
 
-    def _is_electrode (self, ion, nearest_electrode) -> bool:
+    def _is_electrode(self, ion, nearest_electrode) -> bool:
         """
-        Check whether a free ion is close enough to an electrode.
+        Check whether a free ion is close enough to an electrode to bond.
 
         If the ion is within the bonding threshold, transform its attributes
         to electrode configuration, reassign it to the electrode group, and
         return True.
 
         Args:
-            ion (Atom): Atom of interest.
-            nearest_electrode (Atom): Nearest electrode to the atom.
+            ion (Ion): Free ion of interest.
+            nearest_electrode (Electrode): Nearest electrode to the ion.
 
         Returns:
             bool: True if the ion was transformed into an electrode; otherwise False.
@@ -124,20 +125,20 @@ class Calculation ():
             return True
         return False
 
-    def _gen_biased_vector (self, ion, nearest_electrode) -> np.array:
+    def _gen_biased_vector(self, ion, nearest_electrode) -> np.ndarray:
         """
-        Calculate a biased motion vector for the atom.
+        Calculate a biased motion vector for the ion.
 
         The returned vector is a normalized combination of the preferred
-        direction (towards the nearest electrode, weighted by a probability
-        from the config) and a random direction (weighted by 1 - probability).
+        direction (towards the nearest electrode, weighted by DIREC_PROB)
+        and a random direction (weighted by 1 - DIREC_PROB).
 
         Args:
-            ion (Atom): Atom of interest.
-            nearest_electrode (Atom): Nearest electrode of the dendrimer.
+            ion (Ion): Free ion of interest.
+            nearest_electrode (Electrode): Nearest electrode of the dendrimer.
 
         Returns:
-            np.array: Normalized motion vector for the atom.
+            np.ndarray: Normalized motion vector for the ion movement.
         """
         probability = config.DIREC_PROB
         pref_direc = nearest_electrode.position - ion.position

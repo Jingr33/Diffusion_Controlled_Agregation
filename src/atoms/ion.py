@@ -19,19 +19,19 @@ class Ion(AtomBase):
         parent_electrode (Atom): For ions: None. For electrodes: reference to the
             neighboring electrode with lower generation.
     """
-    def __init__(self, position : np.array) -> None:
+    def __init__(self, position: np.ndarray) -> None:
         """
-        Initialize an Atom instance.
+        Initialize an Ion instance.
 
         Args:
-            position (np.array): 3D position of the atom in space.
+            position (np.ndarray): 3D position of the ion in space [x, y, z].
         """
         super().__init__(position)
         self.electrode_dist = Calculation.vec_magnitude(Calculation.opposite_direction(self.position))
 
-    def display(self, view, sim_time : str) -> None:
+    def display(self, view, sim_time: str) -> None:
         """
-        Display the atom as a sphere in the visualization.
+        Display the ion as a sphere in the visualization.
 
         Args:
             view (vispy.scene.visuals): View window for the simulation.
@@ -41,12 +41,12 @@ class Ion(AtomBase):
         self.color = self._set_fg_color()
         self._display_sphere(view, position)
 
-    def transform_to_electrode (self, nearest_electrode) -> None:
+    def transform_to_electrode(self, nearest_electrode) -> None:
         """
         Convert an ion into an electrode when it becomes bound to the dendrimer.
 
         Args:
-            nearest_electrode (Atom): Nearest (connected) electrode to this atom.
+            nearest_electrode (Electrode): Nearest (parent) electrode to this ion.
         """
         self.__class__ = Electrode
         self.parent_electrode = nearest_electrode
@@ -55,14 +55,14 @@ class Ion(AtomBase):
         new_pos = Calculation.final_pos_optimalization(self)
         self.update_position(new_pos)
 
-    def _set_fg_color (self, generation : Optional[int] = None) -> Any:
+    def _set_fg_color(self, generation: Optional[int] = None) -> Any:
         """
         Determine an ion color.
 
         Args:
-            generation (int): use -1 for a free ion.
+            generation (Optional[int]): Generation index (always -1 for free ions).
 
         Returns:
-            Any: Color specification for the atom, in the format used by the config.
+            Any: Color specification for the ion from config.ATOM_COLORS[-1].
         """
         return config.ATOM_COLORS[-1]
