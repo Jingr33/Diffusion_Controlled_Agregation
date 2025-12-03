@@ -15,9 +15,12 @@ class ChartCreator ():
         Shows the estimated fractal dimension of dendrimers created from a layout.
     """
 
-    def __init__(self, layout : Layout):
+    def __init__(self, layout: Layout):
         """
-        Initialize the chart creator.
+        Initialize the chart creator and display a plot.
+
+        Args:
+            layout (Layout): Type of layout for which to plot the results.
         """
         self._gyratio_ratio_service = injector.get(GyrationRatioService)
         self.layout = layout
@@ -30,9 +33,9 @@ class ChartCreator ():
         self._calc_data()
         self._plot()
 
-    def _load_simulation_data_from_db (self) -> None:
+    def _load_simulation_data_from_db(self) -> None:
         """
-        Load data from the database.
+        Load simulation data from the database for the specified layout.
         """
         simulation_data = self._gyratio_ratio_service.get_all_gyration_ratios_with_layout(self.layout)
         self.gyrations = [
@@ -45,9 +48,11 @@ class ChartCreator ():
         ]
         self.atoms_numbers = [x.atoms for x in simulation_data]
 
-    def _calc_data (self) -> None:
+    def _calc_data(self) -> None:
         """
         Prepare data for the chart and calculate the fractal dimension of the dendrimers.
+        
+        Performs logarithmic transformation and polynomial fit to determine fractal dimension.
         """
         self.log_n = np.log10(self.atoms_numbers)
         self.log_rg = np.log10(self.gyrations)
