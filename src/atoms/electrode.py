@@ -15,21 +15,21 @@ class Electrode(AtomBase):
         generation (int): Generation index of the particle within the dendrimer.
         positions_list (list): List of all positions occupied during the simulation.
     """
-    def __init__(self, position : np.array) -> None:
+    def __init__(self, position: np.ndarray) -> None:
         """
-        Initialize an Atom instance.
+        Initialize an Electrode instance.
 
         Args:
-            position (np.array): 3D position of the atom in space.
+            position (np.ndarray): 3D position of the electrode in space [x, y, z].
         """
         super().__init__(position)
         self.generation = 0
         self.orig_generation = self.generation
         self.parent_electrode = None
 
-    def display(self, view, sim_time : str) -> None:
+    def display(self, view, sim_time: str) -> None:
         """
-        Display the atom as a sphere in the visualization.
+        Display the electrode as a sphere in the visualization.
 
         Args:
             view (vispy.scene.visuals): View window for the simulation.
@@ -40,15 +40,15 @@ class Electrode(AtomBase):
         self.color = self._set_fg_color(generation)
         self._display_sphere(view, position)
 
-    def _set_fg_color (self, generation : Optional[int] = None) -> Any:
+    def _set_fg_color(self, generation: Optional[int] = None) -> Any:
         """
         Determine the electrode color based on its generation in the dendrimer.
 
         Args:
-            generation (int): Generation index of the particle .
+            generation (Optional[int]): Generation index of the electrode.
 
         Returns:
-            Any: Color specification for the atom, in the format used by the config.
+            Any: Color specification for the electrode from config.ATOM_COLORS.
         """
         if generation is None:
             return config.ATOM_COLORS[-1]

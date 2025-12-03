@@ -20,12 +20,12 @@ class Simulation ():
         electrodes (list): List of electrode objects in the simulation.
         _radius_of_gyration (float): Gyration radius of the resulting dendrimer.
     """
-    def __init__(self, layout : str, atoms_num : int) -> None:
+    def __init__(self, layout: str, atoms_num: int) -> None:
         """
         Initialize the Simulation object.
 
         Args:
-            layout (str): Starting layout of the simulation.
+            layout (str): Starting layout of free ions ("cube", "sphere" or "random").
             atoms_num (int): Number of atoms in the simulation.
         """
         self._gyratio_ratio_service = injector.get(GyrationRatioService)
@@ -45,9 +45,9 @@ class Simulation ():
         """
         return self.ions + self.electrodes
 
-    def _generate_ion_layout (self) -> None:
+    def _generate_ion_layout(self) -> None:
         """
-        Generate the initial layout of atoms using the layout generator.
+        Generate the initial layout of free ions using the layout generator.
         """
         layout_gen = LayoutGenerator(self.layout, self.atoms_num)
         coords = layout_gen.get_start_pos()
@@ -60,23 +60,23 @@ class Simulation ():
         Create the first electrode before the simulation starts.
 
         Returns:
-            Atom: Electrode placed at position (0, 0, 0).
+            Electrode: Electrode placed at origin position (0, 0, 0).
         """
         electrode = Electrode(np.array([0, 0, 0]))
         electrode.parent_electrode = electrode
         self.electrodes.append(electrode)
         return electrode
 
-    def _calculate_simulation (self) -> None:
+    def _calculate_simulation(self) -> None:
         """
         Run the simulation calculation using the Calculation class.
         """
         calc = Calculation(self)
         calc.calculate_sim()
 
-    def _calc_gyration (self) -> float:
+    def _calc_gyration(self) -> float:
         """
-        Calculate the radius of gyration of the molecule.
+        Calculate the radius of gyration of the dendrimer.
 
         Returns:
             float: The radius of gyration.
@@ -89,24 +89,24 @@ class Simulation ():
             r_pow2_sum += np.power(r_atom, 2)
         return np.sqrt(r_pow2_sum / self.atoms_num)
 
-    def _center_of_mass (self, atoms : list) -> np.array:
+    def _center_of_mass(self, atoms: list) -> np.ndarray:
         """
-        Calculate the center of mass of the molecule.
+        Calculate the center of mass of all atoms.
 
         Args:
-            atoms (list): List of all atoms in the simulation.
+            atoms (list): List of all atoms (ions and electrodes) in the simulation.
 
         Returns:
-            np.array: The center of mass position.
+            np.ndarray: The center of mass position.
         """
         pos_sum = np.array([0, 0, 0])
         for atom in atoms:
             pos_sum = pos_sum + atom.position
         return np.array(pos_sum / self.atoms_num)
 
-    def _save_to_db (self) -> None:
+    def _save_to_db(self) -> None:
         """
-        Save N and Rg to the database.
+        Save the number of atoms (N) and radius of gyration (Rg) to the database.
         """
         self._gyratio_ratio_service.add_or_update_gyration_ratio(
             atoms = self.atoms_num,
